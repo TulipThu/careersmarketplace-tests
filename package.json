@@ -1,15 +1,27 @@
 {
-  "name": "playwright-tests",
+  "name": "careersmarketplace-tests",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {},
-  "keywords": [],
+  "description": "Playwright end-to-end tests for the UNOPS Careers Marketplace",
+  "private": true,
+  "scripts": {
+    "test": "playwright test home login profile marketplace --project=chromium",
+    "test:headed": "playwright test home login profile marketplace --project=chromium --headed --workers=1",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "playwright",
+    "e2e",
+    "unops",
+    "careers-marketplace"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.59.1",
-    "@types/node": "^25.6.0"
+    "@types/node": "^25.6.0",
+    "dotenv": "^17.4.2",
+    "typescript": "^7.0.2"
   }
 }

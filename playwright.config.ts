@@ -4,9 +4,19 @@ import { defineConfig, devices } from '@playwright/test';
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+import dotenv from 'dotenv';
+import path from 'path';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { decryptPassword } = require('./lib/credentials');
+
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+if (process.env.LOGIN_PASSWORD_ENCRYPTED && process.env.LOGIN_SECRET) {
+  process.env.LOGIN_PASSWORD = decryptPassword(
+    process.env.LOGIN_PASSWORD_ENCRYPTED,
+    process.env.LOGIN_SECRET
+  );
+}
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -25,18 +35,31 @@ export default defineConfig({
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Base URL to use in actions like `await page.goto('')`. */
-    // baseURL: 'http://localhost:3000',
+    /* Base URL to use in actions like `await page.goto('/')`. */
+    baseURL: process.env.BASE_URL || 'https://careers.unops.org',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    /* Show the real browser on this machine when not running in CI. */
+    headless: !!process.env.CI,
+    video: process.env.CI ? 'off' : 'on',
+    launchOptions: process.env.CI
+      ? {}
+      : {
+          slowMo: 800,
+          args: ['--window-position=80,80', '--window-size=1280,800'],
+        },
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        /* Use the Chrome installed on this PC so the window appears on your desktop. */
+        ...(process.env.CI ? {} : { channel: 'chrome' }),
+      },
     },
 
     {
