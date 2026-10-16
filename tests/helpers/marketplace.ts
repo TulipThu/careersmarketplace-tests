@@ -11,3 +11,10 @@ export async function goToSearchJobs(page: Page): Promise<void> {
   await seeAllLink.click();
   await page.waitForURL('**/SearchJobs**', { timeout: 30000 });
 }
+
+/** Open Positions / job search results page with the filter panel. */
+export async function goToOpenPositionsPage(page: Page): Promise<void> {
+  await page.goto('/careersmarketplace/SearchJobs', { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await acceptCookiesIfVisible(page);
+  await expect(page.getByRole('heading', { name: 'Filter jobs by' })).toBeVisible({ timeout: 15000 });
+}
